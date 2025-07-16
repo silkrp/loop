@@ -26,10 +26,8 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_loop
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
 params.fasta = getGenomeAttribute('fasta')
+params.gtf = getGenomeAttribute('gtf')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,7 +41,14 @@ params.fasta = getGenomeAttribute('fasta')
 workflow NFCORE_LOOP {
 
     take:
-    samplesheet // channel: samplesheet read in from --input
+    sr_samplesheet // channel: samplesheet read in from --input
+    lr_samplesheet // channel: samplesheet read in from --input
+    reference   // channel: reference genome read in from --genome
+    annotation  // channel: annotation file read in from --gtf
+    gurobi      // channel: gurobi licence file read in from --gurobi
+    mosek
+    aa_data
+    cresil_reference
 
     main:
 
@@ -51,8 +56,16 @@ workflow NFCORE_LOOP {
     // WORKFLOW: Run pipeline
     //
     LOOP (
-        samplesheet
+        sr_samplesheet,
+        lr_samplesheet,
+        reference,
+        annotation,
+        gurobi,
+        mosek,
+        aa_data,
+        cresil_reference
     )
+
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -72,15 +85,37 @@ workflow {
         params.monochrome_logs,
         args,
         params.outdir,
-        params.input
+        params.sr_input,
+        params.lr_input
+        params.fasta,
+        params.genome,
+        params.gtf,
+        params.gurobi,
+        params.mosek,
+        params.aa_data,
+        params.cresil_mmi,
+        params.cresil_fa,
+        params.cresil_rmsk,
+        params.cresil_gene,
+        params.cresil_cpg,
+        params.cresil_fai
+
     )
 
     //
     // WORKFLOW: Run main workflow
     //
     NFCORE_LOOP (
-        PIPELINE_INITIALISATION.out.samplesheet
+        PIPELINE_INITIALISATION.out.samplesheet,
+        PIPELINE_INITIALISATION.out.reference,
+        PIPELINE_INITIALISATION.out.annotation,
+        PIPELINE_INITIALISATION.out.gurobi,
+        PIPELINE_INITIALISATION.out.mosek,
+        PIPELINE_INITIALISATION.out.aa_data,
+        PIPELINE_INITIALISATION.out.cresil_reference
+
     )
+
     //
     // SUBWORKFLOW: Run completion tasks
     //
@@ -90,8 +125,9 @@ workflow {
         params.plaintext_email,
         params.outdir,
         params.monochrome_logs,
-        params.hook_url,
+        params.hook_url
     )
+
 }
 
 /*

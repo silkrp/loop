@@ -31,7 +31,21 @@ workflow PIPELINE_INITIALISATION {
     monochrome_logs   // boolean: Do not use coloured log outputs
     nextflow_cli_args //   array: List of positional nextflow CLI args
     outdir            //  string: The output directory where the results will be saved
-    input             //  string: Path to input samplesheet
+    sr_input             //  string: Path to input samplesheet
+    lr_input
+    fasta             //  string: Path to genome FASTA file
+    genome            //  string: Genome key from config file
+    gtf               //  string: Path to genome GTF file
+    cnn               //  string: Path to .cnn file from CoRAL github for CNV calling
+    gurobi            //  string: path to gurobi.lic file 
+    mosek
+    aa_data
+    cresil_mmi
+    cresil_fa
+    cresil_rmsk
+    cresil_gene
+    cresil_cpg
+    cresil_fai
 
     main:
 
@@ -71,29 +85,55 @@ workflow PIPELINE_INITIALISATION {
     //
     // Create channel from input file provided through params.input
     //
+    Channel
+        .fromList(samplesheetToList(params.sr_input, "${projectDir}/assets/schema_sr_input.json"))
+        .set { ch_sr_samplesheet }
 
     Channel
-        .fromList(samplesheetToList(params.input, "${projectDir}/assets/schema_input.json"))
-        .map {
-            meta, fastq_1, fastq_2 ->
-                if (!fastq_2) {
-                    return [ meta.id, meta + [ single_end:true ], [ fastq_1 ] ]
-                } else {
-                    return [ meta.id, meta + [ single_end:false ], [ fastq_1, fastq_2 ] ]
-                }
-        }
-        .groupTuple()
-        .map { samplesheet ->
-            validateInputSamplesheet(samplesheet)
-        }
-        .map {
-            meta, fastqs ->
-                return [ meta, fastqs.flatten() ]
-        }
-        .set { ch_samplesheet }
+        .fromList(samplesheetToList(params.lr_input, "${projectDir}/assets/schema_lr_input.json"))
+        .set { ch_lr_samplesheet }
+
+    //
+    // Create channel from reference file provided through params.genome
+    //
+    ch_reference = Channel.value( [ [genome: genome], file(fasta) ] )
+
+    //
+    // Create channel from annotation file provided through params.gtf
+    //    
+    ch_annotation = Channel.value( [ [genome: genome], file(gtf) ] )
+
+    //
+    // Create channel for gurobi.lic file provided through params.gurobi
+    //   
+    ch_gurobi = Channel.value( [ [licence: "gurobi"], file(gurobi) ] )
+
+    //
+    // Create channel for mosek.lic file provided through params.mosek
+    //   
+    ch_mosek = Channel.value( [ [licence: "mosek"], file(mosek) ] )
+
+    //
+    // Create channel for gurobi.lic file provided through params.gurobi
+    //   
+    ch_aa_data = Channel.value( [ [data: "ampliconsuite"], file(aa_data) ] )
+
+    //
+    // Create channel for gurobi.lic file provided through params.gurobi
+    //   
+    ch_cresil_reference = Channel.value( [ [data: "ampliconsuite"], [file(cresil_mmi), file(cresil_fa), file(cresil_rmsk), file(cresil_gene), file(cresil_cpg), file(cresil_fai)] ] )
+    
 
     emit:
-    samplesheet = ch_samplesheet
+    sr_samplesheet = ch_sr_samplesheet
+    lr_samplesheet = ch_lr_samplesheet
+    reference   = ch_reference
+    annotation  = ch_annotation
+    cnn         = ch_cnn
+    gurobi      = ch_gurobi
+    mosek       = ch_mosek
+    aa_data     = ch_aa_data
+    cresil_reference = ch_cresil_reference
     versions    = ch_versions
 }
 
@@ -155,20 +195,6 @@ def validateInputParameters() {
     genomeExistsError()
 }
 
-//
-// Validate channels from input samplesheet
-//
-def validateInputSamplesheet(input) {
-    def (metas, fastqs) = input[1..2]
-
-    // Check that multiple runs of the same sample are of the same datatype i.e. single-end / paired-end
-    def endedness_ok = metas.collect{ meta -> meta.single_end }.unique().size == 1
-    if (!endedness_ok) {
-        error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
-    }
-
-    return [ metas[0], fastqs ]
-}
 //
 // Get attribute from genome config file e.g. fasta
 //
