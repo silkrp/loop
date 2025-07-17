@@ -1,4 +1,8 @@
-# loop
+█ ▄▄▄ ▄▄▄ ▄▄▄▄  
+█ █ █ █ █ █ █
+█ ▀▄▄▄▀ ▀▄▄▄▀ █▄▄▄▀
+█ █  
+ ▀
 
 ## Introduction
 
@@ -15,16 +19,6 @@ The pipeline supports the following tools:
 - **[CoRAL](https://github.com/AmpliconSuite/CoRAL)** – Predicts circular DNA structures using long-read data and copy number information.
 - **[Decoil](https://github.com/madagiurgiu25/decoil-pre)** – A long-read–based method for detecting and characterising ecDNAs from SV calls.
 - **[CReSIL](https://github.com/visanuwan/cresil)** – Uses long-reads to identify ecDNAs via consensus polishing and graph-based analysis.
-
-<!-- TODO nf-core:
-   Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
-   major pipeline sections and the types of output it produces. You're giving an overview to someone new
-   to nf-core here, in 15-20 seconds. For an example, see https://github.com/nf-core/rnaseq/blob/master/README.md#introduction
--->
-
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/contributing/design_guidelines#examples for examples.   -->
-<!-- TODO nf-core: Fill in short bullet-pointed list of the default steps in the pipeline -->
 
 ## Usage
 
@@ -52,10 +46,21 @@ Now, you can run the pipeline using:
 <!-- TODO nf-core: update the following command to include all required parameters for a minimal example -->
 
 ```bash
-nextflow run nf-core/loop \
+nextflow run main.nf \
    -profile <docker/singularity/.../institute> \
-   --input samplesheet.csv \
-   --outdir <OUTDIR>
+    --sr_input ./sr_samplesheet.csv \
+    --lr_input ./lr_samplesheet.csv \
+    --outdir <OUTDIR> \
+    --genome GRCh38 \
+    --gurobi ~/gurobi/gurobi.lic \
+    --mosek ~/mosek/mosek.lic \
+    --aa_data ../data_repo \
+    --cresil_mmi ../cresil_reference/reference.mmi \
+    --cresil_fa ../cresil_reference/reference.fa \
+    --cresil_rmsk ../cresil_reference/reference.rmsk.bed \
+    --cresil_gene ../cresil_reference/reference.gene.bed \
+    --cresil_cpg ../cresil_reference/reference.cpg.bed \
+    --cresil_fai ../cresil_reference/reference.fa.fai
 ```
 
 > [!WARNING]
@@ -65,6 +70,4 @@ For more details and further functionality, please refer to the [usage documenta
 
 ## Pipeline output
 
-To see the results of an example test run with a full size dataset refer to the [results](https://nf-co.re/loop/results) tab on the nf-core website pipeline page.
-For more details about the output files and reports, please refer to the
-[output documentation](https://nf-co.re/loop/output).
+The pipeline will output results from each of the ecDNA prediction algorithms selected. These can be found in the specfiied output directory. Please refer to the individual tool repositories for detailed output information.
