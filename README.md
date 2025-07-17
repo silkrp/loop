@@ -1,7 +1,5 @@
 # loop
 
----
-
 ## Introduction
 
 **loop** is an nextflow pipeline designed to run a range of ecDNA (extrachromosomal DNA) prediction algorithms on both short-read and long-read whole-genome sequencing (WGS) data.
@@ -17,8 +15,6 @@ The pipeline supports the following tools:
 - **[CoRAL](https://github.com/AmpliconSuite/CoRAL)** – Predicts circular DNA structures using long-read data and copy number information.
 - **[Decoil](https://github.com/madagiurgiu25/decoil-pre)** – A long-read–based method for detecting and characterising ecDNAs from SV calls.
 - **[CReSIL](https://github.com/visanuwan/cresil)** – Uses long-reads to identify ecDNAs via consensus polishing and graph-based analysis.
-
----
 
 <!-- TODO nf-core:
    Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
