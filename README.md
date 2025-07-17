@@ -19,7 +19,7 @@
 
 ## Introduction
 
-**nf-core/loop** is a bioinformatics pipeline that ...
+**nf-core/loop** is a bioinformatics pipeline that accepts short and long-reads to predict ecDNAs using a range of algorithms.
 
 <!-- TODO nf-core:
    Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
