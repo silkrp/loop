@@ -33,18 +33,6 @@
                 "exists": true,
                 "pattern": "^\\S+\\.f(ast)?q\\.gz$",
                 "errorMessage": "FastQ file must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
-            },
-            "svs": {
-                "type": "string",
-                "format": "file-path",
-                "exists": true,
-                "errorMessage": "SV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
-            },
-            "cnvs": {
-                "type": "string",
-                "format": "file-path",
-                "exists": true,
-                "errorMessage": "CNV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
             }
         },
         "required": ["sample", "bam", "index", "fastq"]
