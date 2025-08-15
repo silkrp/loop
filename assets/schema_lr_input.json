@@ -49,6 +49,6 @@
                 "errorMessage": "CNV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
             }
         },
-        "required": ["sample", "bam", "index", "fastq", "svs", "cnvs"]
+        "required": ["sample", "bam", "index", "fastq"]
     }
 }
