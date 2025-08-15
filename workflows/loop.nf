@@ -52,7 +52,7 @@ workflow LOOP {
     )
 
     ////////// SHORT READ 
-    if ('short-read' in selected_sv_callers) {
+    if ('short-read' in run_mode) {
 
         //
         // MODULE: Format cnv calls ready for ampliconsuite
@@ -81,7 +81,7 @@ workflow LOOP {
 
     
     ////////// LONG READ 
-    if ('long-read' in selected_sv_callers) {
+    if ('long-read' in run_mode) {
 
         //
         // MODULE: Format cnv calls ready for ampliconsuite
