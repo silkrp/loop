@@ -42,6 +42,8 @@ workflow LOOP {
 
     ch_versions = Channel.empty()
 
+    def run_mode = params.run_mode ? params.run_mode.split(',') : []
+
     //
     // MODULE: Generate .fai index for FASTA
     //
@@ -50,92 +52,101 @@ workflow LOOP {
     )
 
     ////////// SHORT READ 
-    //
-    // MODULE: Format cnv calls ready for ampliconsuite
-    //
-    bcftools_query_sr_input = ch_sr_samplesheet
-        .map({ meta, bam, index, cnvs -> [ meta, cnvs ] })
+    if ('short-read' in selected_sv_callers) {
 
-    BCFTOOLS_QUERY_SR (
-        bcftools_query_sr_input
-    )
+        //
+        // MODULE: Format cnv calls ready for ampliconsuite
+        //
+        bcftools_query_sr_input = ch_sr_samplesheet
+            .map({ meta, bam, index, cnvs -> [ meta, cnvs ] })
 
-    aa_input = ch_sr_samplesheet
-        .map({ meta, bam, index, cnvs -> [ meta, bam, index ] })
-        .join(BCFTOOLS_QUERY.out.output)
+        BCFTOOLS_QUERY_SR (
+            bcftools_query_sr_input
+        )
 
-    // 
-    // MODULE: Run amplicon architect on short-read bam file
-    //
-    AMPLICONSUITE_AA (
-        aa_input,
-        ch_mosek,
-        ch_aa_data
-    )
+        aa_input = ch_sr_samplesheet
+            .map({ meta, bam, index, cnvs -> [ meta, bam, index ] })
+            .join(BCFTOOLS_QUERY.out.output)
+
+        // 
+        // MODULE: Run amplicon architect on short-read bam file
+        //
+        AMPLICONSUITE_AA (
+            aa_input,
+            ch_mosek,
+            ch_aa_data
+        )
+
+    }
 
     
     ////////// LONG READ 
-    //
-    // MODULE: Format cnv calls ready for ampliconsuite
-    //
-    bcftools_query_sr_input = ch_lr_samplesheet
-        .map({ meta, bam, index, fastq, svs, cnvs -> [ meta, cnvs ] })
+    if ('long-read' in selected_sv_callers) {
 
-    BCFTOOLS_QUERY_LR (
-        bcftools_query_sr_input
-    )
+        //
+        // MODULE: Format cnv calls ready for ampliconsuite
+        //
+        bcftools_query_sr_input = ch_lr_samplesheet
+            .map({ meta, bam, index, fastq, svs, cnvs -> [ meta, cnvs ] })
 
-    //
-    // SUBWORKFLOW: Run CoRAL ecDNA prediction using CNV calls
-    //
-    coral_input_ch = ch_lr_samplesheet
-        .map({ meta, bam, index, fastq, svs, cnvs -> [ meta, bam, index ] })
-        .join(BCFTOOLS_QUERY.out.output)
+        BCFTOOLS_QUERY_LR (
+            bcftools_query_sr_input
+        )
 
-    CORAL (
-        coral_input_ch
-        //ch_gurobi
-    )
+        //
+        // SUBWORKFLOW: Run CoRAL ecDNA prediction using CNV calls
+        //
+        coral_input_ch = ch_lr_samplesheet
+            .map({ meta, bam, index, fastq, svs, cnvs -> [ meta, bam, index ] })
+            .join(BCFTOOLS_QUERY.out.output)
 
-    //
-    // SUBWORKFLOW: Run decoil pipeline
-    // 
-    svs_gunzip_input = ch_lr_samplesheet
-         .map({ meta, svs -> [ meta, svs ] })
+        CORAL (
+            coral_input_ch
+            //ch_gurobi
+        )
 
-    svs_gunzip_input
-        .branch { meta, svs ->
-            needs_gunzip: svs.getExtension() == 'gz'
-                return [meta, svs]
-            ready: true
-                return [meta, svs]
-        }
-        .set { input_branched }
+        //
+        // SUBWORKFLOW: Run decoil pipeline
+        // 
+        svs_gunzip_input = ch_lr_samplesheet
+            .map({ meta, svs -> [ meta, svs ] })
 
-    gunzipped = GUNZIP(input_branched.needs_gunzip).gunzip
-    all_gunzipped = gunzipped.mix(input_branched.ready)
+        svs_gunzip_input
+            .branch { meta, svs ->
+                needs_gunzip: svs.getExtension() == 'gz'
+                    return [meta, svs]
+                ready: true
+                    return [meta, svs]
+            }
+            .set { input_branched }
 
-    decoil_input_ch = ch_lr_samplesheet
-        .map({ meta, bam, index, fastq, svs, cnvs -> [ meta, bam, index ] })
-        .join(all_gunzipped)
+        gunzipped = GUNZIP(input_branched.needs_gunzip).gunzip
+        all_gunzipped = gunzipped.mix(input_branched.ready)
 
-    DECOIL (
-        decoil_input_ch,
-        ch_reference,
-        SAMTOOLS_FAIDX.out.fai,
-        ch_annotation
-    )
+        decoil_input_ch = ch_lr_samplesheet
+            .map({ meta, bam, index, fastq, svs, cnvs -> [ meta, bam, index ] })
+            .join(all_gunzipped)
 
-    //
-    // SUBWORKFLOW: Run CReSIL
-    //
-    cresil_input_ch = ch_lr_samplesheet
-         .map({ meta, bam, index, fastq, svs, cnvs -> [ meta, fastq ] })
+        DECOIL (
+            decoil_input_ch,
+            ch_reference,
+            SAMTOOLS_FAIDX.out.fai,
+            ch_annotation
+        )
 
-    CRESIL (
-        ch_reads,
-        ch_cresil_reference
-    )
+        //
+        // SUBWORKFLOW: Run CReSIL
+        //
+        cresil_input_ch = ch_lr_samplesheet
+            .map({ meta, bam, index, fastq, svs, cnvs -> [ meta, fastq ] })
+
+        CRESIL (
+            ch_reads,
+            ch_cresil_reference
+        )
+
+    }
+
 
     //
     // Collate and save software versions
