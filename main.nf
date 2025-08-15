@@ -86,7 +86,7 @@ workflow {
         args,
         params.outdir,
         params.sr_input,
-        params.lr_input
+        params.lr_input,
         params.fasta,
         params.genome,
         params.gtf,
