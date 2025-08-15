@@ -3,60 +3,52 @@
     "$id": "https://raw.githubusercontent.com/nf-core/loop/master/assets/schema_input.json",
     "title": "nf-core/thriptic pipeline - params.input schema",
     "description": "Schema for the file provided with params.input",
-    "anyOf": [
-        {
-            "type": "null",
-            "description": "No input file provided"
-        },
-        {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "sample": {
-                        "type": "string",
-                        "pattern": "^\\S+$",
-                        "errorMessage": "Sample name must be provided and cannot contain spaces",
-                        "meta": ["id"]
-                    },
-                    "bam": {
-                        "type": "string",
-                        "format": "file-path",
-                        "exists": true,
-                        "pattern": "^\\S+\\.(bam|cram)$",
-                        "errorMessage": "Alignment file must be provided, cannot contain spaces and must have extension '.bam' or '.cram'"
-                    },
-                    "index": {
-                        "type": "string",
-                        "format": "file-path",
-                        "exists": true,
-                        "pattern": "^\\S+\\.(bam.bai|cram.crai)$",
-                        "errorMessage": "Index file must be provided, cannot contain spaces and must have extension '.bam.bai' or '.cram.crai'"
-                    },
-                    "fastq": {
-                        "type": "string",
-                        "format": "file-path",
-                        "exists": true,
-                        "pattern": "^\\S+\\.f(ast)?q\\.gz$",
-                        "errorMessage": "FastQ file must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
-                    },
-                    "svs": {
-                        "type": "string",
-                        "format": "file-path",
-                        "exists": true,
-                        "pattern": "^\\S+\\.vcf(\\.gz)?$",
-                        "errorMessage": "SV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
-                    },
-                    "cnvs": {
-                        "type": "string",
-                        "format": "file-path",
-                        "exists": true,
-                        "pattern": "^\\S+\\.vcf(\\.gz)?$",
-                        "errorMessage": "CNV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
-                    }
-                },
-                "required": ["sample", "bam", "index", "fastq", "svs", "cnvs"]
+    "type": "array",
+    "items": {
+        "type": "object",
+        "properties": {
+            "sample": {
+                "type": "string",
+                "pattern": "^\\S+$",
+                "errorMessage": "Sample name must be provided and cannot contain spaces",
+                "meta": ["id"]
+            },
+            "bam": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.(bam|cram)$",
+                "errorMessage": "Alignment file must be provided, cannot contain spaces and must have extension '.bam' or '.cram'"
+            },
+            "index": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.(bam.bai|cram.crai)$",
+                "errorMessage": "Index file must be provided, cannot contain spaces and must have extension '.bam.bai' or '.cram.crai'"
+            },
+            "fastq": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.f(ast)?q\\.gz$",
+                "errorMessage": "FastQ file must be provided, cannot contain spaces and must have extension '.fq.gz' or '.fastq.gz'"
+            },
+            "svs": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.vcf(\\.gz)?$",
+                "errorMessage": "SV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
+            },
+            "cnvs": {
+                "type": "string",
+                "format": "file-path",
+                "exists": true,
+                "pattern": "^\\S+\\.vcf(\\.gz)?$",
+                "errorMessage": "CNV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
             }
-        }
-    ]
+        },
+        "required": ["sample", "bam", "index", "fastq", "svs", "cnvs"]
+    }
 }
