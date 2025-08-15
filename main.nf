@@ -106,7 +106,8 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     NFCORE_LOOP (
-        PIPELINE_INITIALISATION.out.samplesheet,
+        PIPELINE_INITIALISATION.out.sr_samplesheet,
+        PIPELINE_INITIALISATION.out.lr_samplesheet,
         PIPELINE_INITIALISATION.out.reference,
         PIPELINE_INITIALISATION.out.annotation,
         PIPELINE_INITIALISATION.out.gurobi,
