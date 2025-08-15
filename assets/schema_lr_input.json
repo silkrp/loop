@@ -38,14 +38,12 @@
                 "type": "string",
                 "format": "file-path",
                 "exists": true,
-                "pattern": "^\\S+\\.vcf(\\.gz)?$",
                 "errorMessage": "SV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
             },
             "cnvs": {
                 "type": "string",
                 "format": "file-path",
                 "exists": true,
-                "pattern": "^\\S+\\.vcf(\\.gz)?$",
                 "errorMessage": "CNV file must be provided, cannot contain spaces, and must have extension '.vcf' or '.vcf.gz'"
             }
         },
