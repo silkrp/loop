@@ -66,7 +66,7 @@ workflow LOOP {
 
         aa_input = ch_sr_samplesheet
             .map({ meta, bam, index, cnvs -> [ meta, bam, index ] })
-            .join(BCFTOOLS_QUERY.out.output)
+            .join(BCFTOOLS_QUERY_SR.out.output)
 
         // 
         // MODULE: Run amplicon architect on short-read bam file
