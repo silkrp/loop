@@ -36,7 +36,6 @@ workflow PIPELINE_INITIALISATION {
     fasta             //  string: Path to genome FASTA file
     genome            //  string: Genome key from config file
     gtf               //  string: Path to genome GTF file
-    cnn               //  string: Path to .cnn file from CoRAL github for CNV calling
     gurobi            //  string: path to gurobi.lic file 
     mosek
     aa_data
@@ -129,7 +128,6 @@ workflow PIPELINE_INITIALISATION {
     lr_samplesheet = ch_lr_samplesheet
     reference   = ch_reference
     annotation  = ch_annotation
-    cnn         = ch_cnn
     gurobi      = ch_gurobi
     mosek       = ch_mosek
     aa_data     = ch_aa_data

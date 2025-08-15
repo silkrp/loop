@@ -90,7 +90,6 @@ workflow {
         params.fasta,
         params.genome,
         params.gtf,
-        params.cnn,
         params.gurobi,
         params.mosek,
         params.aa_data,
