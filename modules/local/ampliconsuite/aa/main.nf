@@ -6,7 +6,7 @@ process AMPLICONSUITE_AA {
     container 'nf-core/prepareaa:1.0.5'
 
     input:
-    tuple val(meta), path(tumour_bam), path(tumour_index), path(normal_bam), path(normal_index), path(cnv_bed)
+    tuple val(meta), path(tumour_bam), path(tumour_index), path(cnv_bed)
     tuple val(meta2), path(mosek_license_dir)
     tuple val(meta3), path(aa_data_repo)
 
@@ -32,8 +32,6 @@ process AMPLICONSUITE_AA {
     script:
     def args = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def cnv_calls = cnv_bed ? "--cnv_bed ${cnv_bed}" : ""
-    def matched_normal = normal_bam ? "--normal_bam ${normal_bam}" : ""
 
     """
     export AA_DATA_REPO=\$(echo $aa_data_repo)
@@ -45,8 +43,7 @@ process AMPLICONSUITE_AA {
         $args \\
         -s $prefix \\
         -t $task.cpus \\
-        ${cnv_calls} \\
-        ${matched_normal} \\
+        --cnv_bed $cnv_bed \\
         --bam $tumour_bam \\
         --ref hg38 \\
         --run_AA --run_AC 

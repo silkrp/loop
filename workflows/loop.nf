@@ -15,7 +15,6 @@ include { CRESIL                                } from '../subworkflows/local/cr
 // MODULES
 include { SAMTOOLS_FAIDX                        } from '../modules/local/samtools/faidx/main'
 include { FORMAT_CNVS                           } from '../modules/local/format_cnvs/main'
-include { BCFTOOLS_QUERY as BCFTOOLS_QUERY_SR   } from '../modules/local/bcftools/query/main'
 include { BCFTOOLS_QUERY as BCFTOOLS_QUERY_LR   } from '../modules/local/bcftools/query/main'
 include { AMPLICONSUITE_AA                      } from '../modules/local/ampliconsuite/aa/main'
 include { GUNZIP                                } from '../modules/nf-core/gunzip/main'
@@ -54,25 +53,11 @@ workflow LOOP {
     ////////// SHORT READ 
     if ('short-read' in run_mode) {
 
-        //
-        // MODULE: Format cnv calls ready for ampliconsuite
-        //
-        bcftools_query_sr_input = ch_sr_samplesheet
-            .map({ meta, bam, index, cnvs -> [ meta, cnvs ] })
-
-        BCFTOOLS_QUERY_SR (
-            bcftools_query_sr_input
-        )
-
-        aa_input = ch_sr_samplesheet
-            .map({ meta, bam, index, cnvs -> [ meta, bam, index ] })
-            .join(BCFTOOLS_QUERY_SR.out.output)
-
         // 
         // MODULE: Run amplicon architect on short-read bam file
         //
         AMPLICONSUITE_AA (
-            aa_input,
+            ch_sr_samplesheet,
             ch_mosek,
             ch_aa_data
         )
